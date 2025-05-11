@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Vérification téléphone - Firebase</title>
-  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js"></script>
+
+  <!-- Firebase (compat) SDK - fonctionne sans module -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
 </head>
 <body>
   <h2>Connexion par téléphone</h2>
@@ -28,7 +30,7 @@
   <div id="result" style="color: green;"></div>
 
   <script>
-    // 🔧 Ton config Firebase
+    // ✅ Configuration Firebase
     const firebaseConfig = {
   apiKey: "AIzaSyB_BCwoJiBN-EZTUeXzptdb0kpdlt-i5ow",
   authDomain: "testsms-9ab09.firebaseapp.com",
@@ -38,14 +40,15 @@
   appId: "1:801448647233:web:a17aa6d75d8f7a580bc4c0"
 };
 
+    // ✅ Initialiser Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // 📱 Initialiser invisible reCAPTCHA
+    // 🔒 reCAPTCHA invisible
     window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
       size: 'invisible',
-      callback: function(response) {
-        // reCAPTCHA résolu automatiquement
+      callback: (response) => {
+        // Le reCAPTCHA a été validé
       }
     });
 
@@ -53,7 +56,6 @@
 
     function sendCode() {
       const phoneNumber = document.getElementById('phoneNumber').value;
-
       auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
         .then(result => {
           confirmationResult = result;
@@ -67,7 +69,6 @@
 
     function verifyCode() {
       const code = document.getElementById('verificationCode').value;
-
       confirmationResult.confirm(code)
         .then(result => {
           const user = result.user;
