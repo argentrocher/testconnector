@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion avec Google</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+    function handleCredentialResponse(response) {
+      // Décoder le token JWT pour extraire les infos de base
+      const data = parseJwt(response.credential);
+      document.getElementById("output").innerHTML = `
+        <h3>Bienvenue ${data.name}</h3>
+        <p><strong>Prénom :</strong> ${data.given_name}</p>
+        <p><strong>Nom :</strong> ${data.family_name}</p>
+        <p><strong>Email :</strong> ${data.email}</p>
+      `;
+    }
+
+    function parseJwt(token) {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    }
+  </script>
+</head>
+<body>
+  <h2>Se connecter avec Google</h2>
+  <div id="g_id_onload"
+       data-client_id="VOTRE_CLIENT_ID"
+       data-callback="handleCredentialResponse">
+  </div>
+  <div class="g_id_signin"
+       data-type="standard"
+       data-shape="rectangular"
+       data-theme="outline"
+       data-text="signin_with"
+       data-size="large">
+  </div>
+  <div id="output"></div>
+</body>
+</html>
