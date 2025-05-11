@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Vérification téléphone - Firebase</title>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js"></script>
+</head>
+<body>
+  <h2>Connexion par téléphone</h2>
+
+  <div>
+    <label>Numéro de téléphone (ex: +33 612345678)</label><br>
+    <input type="tel" id="phoneNumber" placeholder="+33 6 12 34 56 78">
+    <div id="recaptcha-container"></div><br>
+    <button onclick="sendCode()">Envoyer le code</button>
+  </div>
+
+  <br><hr><br>
+
+  <div>
+    <label>Code reçu par SMS</label><br>
+    <input type="text" id="verificationCode" placeholder="123456">
+    <button onclick="verifyCode()">Vérifier le code</button>
+  </div>
+
+  <br><br>
+  <div id="result" style="color: green;"></div>
+
+  <script>
+    // 🔧 Ton config Firebase
+    const firebaseConfig = {
+  apiKey: "AIzaSyB_BCwoJiBN-EZTUeXzptdb0kpdlt-i5ow",
+  authDomain: "testsms-9ab09.firebaseapp.com",
+  projectId: "testsms-9ab09",
+  storageBucket: "testsms-9ab09.firebasestorage.app",
+  messagingSenderId: "801448647233",
+  appId: "1:801448647233:web:a17aa6d75d8f7a580bc4c0"
+};
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // 📱 Initialiser invisible reCAPTCHA
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      size: 'invisible',
+      callback: function(response) {
+        // reCAPTCHA résolu automatiquement
+      }
+    });
+
+    let confirmationResult;
+
+    function sendCode() {
+      const phoneNumber = document.getElementById('phoneNumber').value;
+
+      auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
+        .then(result => {
+          confirmationResult = result;
+          document.getElementById('result').innerText = "✅ Code envoyé par SMS.";
+        })
+        .catch(error => {
+          console.error(error);
+          document.getElementById('result').innerText = "❌ Erreur : " + error.message;
+        });
+    }
+
+    function verifyCode() {
+      const code = document.getElementById('verificationCode').value;
+
+      confirmationResult.confirm(code)
+        .then(result => {
+          const user = result.user;
+          document.getElementById('result').innerText = "✅ Numéro vérifié : " + user.phoneNumber;
+        })
+        .catch(error => {
+          document.getElementById('result').innerText = "❌ Code incorrect ou expiré.";
+        });
+    }
+  </script>
+</body>
+</html>
